@@ -95,7 +95,7 @@ async function asyncInitAssociate() {
 }
 
 module.exports = {
-    Car
+    Car,
     Owner
 }
 
