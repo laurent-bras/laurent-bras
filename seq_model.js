@@ -1,4 +1,4 @@
-const { STRING, TEXT, INTEGER, BOOLEAN, UUID, UUIDV4, ENUM, ARRAY, JSONB, DATE } = require('sequelize');
+const { STRING, INTEGER, UUID, UUIDV4, ENUM, BOOLEAN } = require('sequelize');
 const config = require('./config');
 
 const Owner = config.define('owner', 
@@ -9,22 +9,10 @@ const Owner = config.define('owner',
         primaryKey: true,
         defaultValue: UUIDV4,
         autoIncrement: false,
-        get() {
-            return this.getDataValue('uid')
-        }
     },
     "login": {
-        type: STRING,
-        get() {
-            return this.getDataValue('login')
-        }            
+        type: STRING,         
     },
-    "CarId": {
-        type: STRING,
-        get() {
-            return this.getDataValue('CarId')
-        }            
-    }
 }, 
 {
     freezeTableName: true,
@@ -45,15 +33,12 @@ const Car = config.define('car',
         primaryKey: true,
         defaultValue: UUIDV4,
         autoIncrement: false,
-        get() {
-            return this.getDataValue('uid')
-        } 
     },
     "name": {
         type: STRING
     },
     "model": {
-        type: ENUM('XXX','XXXXXXXXX')            
+        type: ENUM('PSA','RENAULT')            
     },       
     "width": {
         type: INTEGER
@@ -61,15 +46,11 @@ const Car = config.define('car',
     "height": {
         type: INTEGER
     },
-    "mediumId": {
-        type: UUID,
-        get() {
-            return this.getDataValue('mediumId')
-        } 
+    "readOnly": {
+        type: BOOLEAN
     },
-    "truckId": {
-        type: UUID,
-        description:"Foreign Key"
+    "ownerId": {
+        type: STRING,    
     }
 }, 
 {
@@ -83,20 +64,63 @@ const Car = config.define('car',
     ]
 });
 
+const Wheel = config.define('wheel', 
+{
+    "uid": {
+        type: UUID,
+        allowNull: false,
+        primaryKey: true,
+        defaultValue: UUIDV4,
+        autoIncrement: false,
+    },
+    "name": {
+        type: STRING
+    },      
+    "size": {
+        type: INTEGER
+    },   
+    "readOnly": {
+        type: BOOLEAN
+    },
+    "carId": {
+        type: STRING,    
+    }
+}, 
+{
+    freezeTableName: true,
+    schema: 'mySchema',
+    indexes: [
+        {
+            unique: true,
+            fields: ['uid']
+        }
+    ]
+});
    
-    /* Association table */
-
-async function asyncInitAssociate() {
-    
-    Car.hasMany(Owner, { foreignKey: 'CarId', sourceKey: 'uid', constraints: true, onDelete: 'cascade' });
-    Owner.belongsTo(Car, { foreignKey: 'CarId', targetKey: 'uid', constraints: true}); 
-
-   
+const initAssociate = () => {
+    return new Promise((resolve, reject) => {
+        try {
+            Car.belongsTo(Owner, { foreignKey: 'ownerId', targetKey: 'uid', constraints: true}); 
+            Owner.hasMany(Car, { foreignKey: 'ownerId', sourceKey: 'uid', constraints: true, onDelete: 'cascade' });
+            
+            Wheel.belongsTo(Car, { foreignKey: 'carId', targetKey: 'uid', constraints: true}); 
+            Car.hasMany(Wheel, { foreignKey: 'carId', sourceKey: 'uid', constraints: true, onDelete: 'cascade' });
+            
+            resolve({
+                msg: "ok"
+            });
+        } catch (error) {
+            reject({
+                msg: "Failed to load sequelize model",
+                error,
+            })
+        }
+    });
 }
 
 module.exports = {
     Car,
-    Owner
+    Owner,
+    Wheel,
+    initAssociate,
 }
-
-module.exports.initAssociate = () => asyncInitAssociate()
