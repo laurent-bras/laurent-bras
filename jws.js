@@ -1,13 +1,12 @@
-
 const jwt = require('jsonwebtoken');
 const { mySecret } = require('./configuration');
 
-module.exports.checkAuth = (req, res, next) => {
+const checkAuth = (req, res, next) => {
     try {
         let token = req.headers.authorization.split(" ")[1];
         let base64data = Buffer.from(mySecret).toString('base64');
         let decoded = jwt.verify(token, base64data, {
-            algorithms: ["XXXX", "YYYYY"]
+            algorithms: ["XXXX", "YYYY"]
         });
 
         req.userData = decoded;
@@ -19,17 +18,21 @@ module.exports.checkAuth = (req, res, next) => {
     }
 }
 
-module.exports.getToken = () => {
+const getToken = () => {
     let base64data = Buffer.from(mySecret).toString('base64');
     let payload = {
         data: {
             id: "XXXXXXXXXXXXXXXX",
             name: "YYYYYYYYYYY",
         },
-        exp: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,
+        exp: XXXXXXXXXXX,
     }
 
     let token = jwt.sign(payload, base64data);
-    return 'Bearer ' + token;
+    return `Bearer ${token}`;
 }
 
+module.exports = {
+    checkAuth,
+    getToken,
+};
