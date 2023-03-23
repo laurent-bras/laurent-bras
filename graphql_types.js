@@ -1,7 +1,4 @@
-const { GraphQLString, GraphQLInt, GraphQLBoolean, GraphQLNonNull, GraphQLList, GraphQLObjectType } = require('graphql')
-const { GraphQLDateTime } = require('graphql-iso-date');
-
-
+const { GraphQLString, GraphQLBoolean, GraphQLList, GraphQLObjectType } = require('graphql')
 
 const previewType = new GraphQLObjectType({
     name: 'Preview',
@@ -15,8 +12,6 @@ const previewType = new GraphQLObjectType({
         }
     }
 })
-
-
 
 const car = new GraphQLObjectType({
     "name": 'Medium',
@@ -39,8 +34,7 @@ const car = new GraphQLObjectType({
         },
     }
 });
-
-
   
-exports.car = car
-
+module.exports = {
+    car
+};
