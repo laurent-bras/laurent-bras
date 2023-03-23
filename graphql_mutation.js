@@ -1,9 +1,8 @@
-const { GraphQLString, GraphQLBoolean, GraphQLNonNull } = require('graphql')
+const { GraphQLString, GraphQLNonNull } = require('graphql');
+const { thing } = require('../types/thingInput');
+const { thingSave, thingDelete } = require('../../sequelize/methods/thing');
 
-const { thing } = require('../types/thingInput')
-const { thingSave, thingDelete } = require('../../sequelize/methods/thing')
-
-exports.fields = {
+const fields = {
     "savething": {
         type: GraphQLString,
         description: "Create a new thing or update one if the thing id is provided",
@@ -25,3 +24,7 @@ exports.fields = {
         resolve: (_, {thingId}) => thingDelete(thingId)
     }
 }
+
+module.exports = {
+    fields
+};
